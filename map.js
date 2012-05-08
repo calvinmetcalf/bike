@@ -1,11 +1,11 @@
 var m;
-var tid = 3206745;
-var gwid = 1808742;
+var tid = 3831965;
+//var gwid = 1808742;
 var geocoder = new google.maps.Geocoder();
 var zoom = 8;
 var center = new google.maps.LatLng(42.04113400940814,-71.795654296875);
 var marker;
-var mainLayer,greenWay;
+var mainLayer/*,greenWay*/;
 
 $(function() {
         $( "#tabs" ).tabs({
@@ -24,12 +24,12 @@ function fusion() {
       zoom: zoom,
       mapTypeId: 'roadmap'
     });
-greenWay = new google.maps.FusionTablesLayer(gwid);
+//greenWay = new google.maps.FusionTablesLayer(gwid);
  mainLayer = new google.maps.FusionTablesLayer(tid);
- greenWay.setQuery("SELECT 'geometry' FROM " + gwid + " WHERE 'Preferred' ='Y'" );
+// greenWay.setQuery("SELECT 'geometry' FROM " + gwid + " WHERE 'Preferred' ='Y'" );
   mainLayer.setQuery("SELECT 'geometry' FROM " + tid);
-  greenWay.setMap(m);
-  greenWay.setOptions({suppressInfoWindows:true});
+//  greenWay.setMap(m);
+ // greenWay.setOptions({suppressInfoWindows:true});
   mainLayer.setMap(m);
   }
 
@@ -61,7 +61,7 @@ marker.setMap(null);
     google.load('visualization', '1', {});
     
 function popLists(){    
-    MakePopList('Type',getFacTypeData);
+    MakePopList('NewType',getFacTypeData);
    MakePopList('Status',getStatusData);
     }
 
@@ -71,7 +71,7 @@ function MakePopList(columnName,callfunc){
     query.send(callfunc);
 	}
     
-var getFacTypeData = MakeData("facType"," 'Type' like '");
+var getFacTypeData = MakeData("facType"," 'NewType' like '");
 var getStatusData = MakeData("facStatus"," 'Status' like '");
 
 function MakeData(selectID,querryText){
