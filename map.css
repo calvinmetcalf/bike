@@ -1,0 +1,26 @@
+ html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0;font-family: 'Ubuntu',Verdana,Arial,sans-serif;font-size: .9em; }
+  #map{ height: 100% }
+  #tabs{position:absolute;
+  z-index:10;
+  margin-left:75px;
+  margin-top:5px;
+  padding:0;
+  font-size:12px;}
+  #legend{
+      background-color:white;
+      border-style:solid;
+  border-width:2px;
+  z-index:11;
+  position: absolute;
+  bottom:20px;
+  left: 15px;
+  padding-left:10px;
+  padding-right:10px;
+  }
+  #logo{
+   position:absolute;
+   bottom:20px;
+   right:15px;
+   z-index:11;
+  }

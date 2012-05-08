@@ -1,74 +1,45 @@
-<!DOCTYPE HTML>
- 
+<!DOCTYPE html>
 <html>
- 
-<head id="Head">
-
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
- 
-<script type="text/javascript" src="bike.js"></script>
-<link rel="stylesheet" type="text/css" href="bike.css" />
-<link rel="shortcut icon" type="image/x-icon"
- href="favicon.ico" /><title>
- 
+  <head>
+  <!--favicon-->
+  <link rel="shortcut icon"
+ href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABKqkQAAAAAAAAAAABKqkQXSqpEmkqqRPpKqkT/SqpE/0qqRP9KqkT/SqpE/0qqROhKqkReSqpEBwAAAABKqkQASqpEAAAAAABKqkRGSqpE5EqqRP9KqkT/SqpE/0qqRP9KqkT/SqpE/0qqRP5KqkT/SqpE/0qqRLZKqkQaAAAAAAAAAABKqkQ5SqpE6UqqRP9KqkT+SqpE/0qqRP9KqkT/SqpE/0qqRP9KqkT/SqpE/kqqRP5KqkT/SqpEuEqqRAdKqkQKSqpEuEqqRP9KqkT/SalD/0mpQ/5JqUP/SqpE/0qqRPxKqkT8SqlE/0mpQ/9JqkP/SqpE/kqqRP9JqUNiS6pFMEyrRppNq0d7TKtGl0qqROFKqkT/SalD/0uqRclMrEZwTaxIakuqRbtKqkT+SalD/0uqRbpLqkXESalD7EqqRIdbslUxTqtIZVOuTTxQrUo0SqpE60yrRs9asFMUTqxJb06sSIBcs1YUTKtGsUqqRP9KqkRwS6pFgUmpQ/9KqkTEWbFTQUqqRONKqkT6Uq1MO0yrRsFTrk45TatHekmpQ/9JqUP/TKtGslKtTERKqkT8SqpEc0uqRYRJqUP/SqpE3VmxUz9KqkTiSqpE/UyqR31PrEma////AEyrRstJqUP/SqpE/kqqRNhTrk44SqpE+EqqRHNLqkWESalD/0qqRNFZsVNASqpE5UmpQ/9OrEhaTatHsVuzVhpMq0akSalD/0mpQ/9LqkXMVK9OOEqqRPxKqkR1S6pFhkmpQ/9KqkSiWLFSPk2rR7tOrEiKX7RZE0qqRN5OrEiaUq5MFkyrRs9LqkXeVa9RKUyrRopLqkXhS6tGXkyrR2xKqkXvS6pFUFKtTE5QrUoaTatHLEyrRqpKqkT/SalD/06sSHVRrEsTTq1IEk6rSGJKqkT/T61KWVSuTR9Wrk8YTqxJm0yqRhNMqkbTS6pF7kuqRf1JqUP/SalD/kmpQ/9KqkT/S6pF5kqqROFKqkT/SalD/0uqRfFMq0bsTKpG9kurRZUAAAAASalDakmpQ/1JqUP/SqpE/kqqRP9KqkT+SalD/0mpQ/9JqUP/SalD/0qqRP5JqUP/SalD/0mpQ+hJqUMZAAAAAAAAAABKqkSaSqpE/EqqRP9KqkT/SqpE/0qqRP9KqkT/SqpE/0qqRP5KqkT/SqpE/0qqROxKqkRMAAAAAEqqRAAAAAAAAAAAAEqqRGhKqkThSqpE/0qqRP9KqkT/SqpE/0qqRP9KqkT/SqpE/0qqRL9KqkQ+AAAAAAAAAAAAAAAASqpEAAAAAAAAAAAASqpEFEqqRGBKqkS5SqpE6EqqRPBKqkTZSqpEnUqqRDxKqkQMAAAAAAAAAABKqkQA8A8AAOADAADAAQAAgAEAAKDAAAB5pAAASxQAAEoUAABKFAAASSYAAPHuAACAAAAAwAEAAMADAADwBwAA/B8AAA==" />
+<title>
 Bike Paths
- 
 </title>
-
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-26192716-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
+<!--style sheets-->
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="map.css" type="text/css" />
+<link rel="stylesheet" href="http://calvinmetcalf.github.com/smoothness/smoothness.css" type="text/css" />
+<!--scripts-->
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBvl2Lx_Tj-9N_fT9arfnl8utRkVPe50uA&sensor=false"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+ <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script type="text/javascript" src="map.js"></script>
+<script type="text/javascript" src="http://calvinmetcalf.github.com/jquery-placeholder/jquery.placeholder.min.js"></script>
 </head>
- 
-<body onload="initialize();" id="body">
-<div id="description2" >trouble viewing map?<a href="http://www.google.com/fusiontables/DataSource?dsrcid=1806563" target="_blank"> view the table on Google Fusion Tables</a> or <a href="https://www.google.com/fusiontables/api/query?sql=SELECT+*+FROM+1806563" target="_blank">Down Load the Table</a></div>
-     <div id="descriptionbox" class="hide"> <span id="togglebox"><span id="descriptionToggle" onkeypress="entertoggle(event)" onClick="toggleInfo()" tabindex="20"><b>Search</b></span><span id="descriptionToggle1" onClick="toggleInfo1()" onkeypress="entertoggle1(event)" tabindex="30"><b>Query</b></span><!--<span id="descriptionToggle3" onClick="toggleInfo3()" onkeypress="entertoggle3(event)" tabindex="40"><b>BSG</b></span>-->
-     </span>
-	<div id="description" class="hide"> <input type="text" id="address" style="width:16em;" value="Enter an Address or LatLong" onClick="SelectAll('address');" tabindex="21"/>
-  <input type="button" onclick="zoomtoaddress()" value="Search" tabindex="22"/><input type="button" onclick="reset()" value="Reset" tabindex="23"/></div> <div id="description1" class="hide">
+<body>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Search</a></li>
+		<li><a href="#tabs-2">Query</a></li>
+		
+	</ul>
+	<div id="tabs-1">
+		 <input type="text" id="address" style="width:16em;" placeholder="Enter an Address or LatLong" />
+  <input type="submit" value="Search" onClick="geocode();"/>
+  <input type="reset" value="Reset" onClick="resetgeo();"/>
 
-<select id="c3" onchange="changeMap();" tabindex="32">
-   			        <option value="">All Types</option>
-       <option value=" AND 'FacType' = '1'">On-road marked lane</option>
-    <option value=" AND 'FacType' = '2'">On-road divided lane</option>
-    <option value=" AND 'FacType' = '3'">On-road sign-posted bike route</option>
-    <option value=" AND 'FacType' = '4'">On-road unsigned</option>
-    <option value=" AND 'FacType' = '9'">On-road marked shared lane</option>
-    <option value=" AND 'FacType' = '5'">Off-road shared use path</option>
-    <option value=" AND 'FacType' = '6'">Off-road Minimally improved path</option>
-    
-
-      </select>
- 
-<select id="c2" onchange="changeMap();" tabindex="33">
- <option value="">All Surfaces</option>
-   			    <option value=" AND 'Facsur' = 1">Unimproved (graded earth or soil)</option>
-    <option value=" AND 'Facsur' = 2">Gravel or stone</option>
-    <option value=" AND 'Facsur' = 3">Brick</option><!--is only one -->
-    <option value=" AND 'Facsur' = 4">Block</option><!--are only 5-->
-    <option value=" AND 'Facsur' = 5">Surface-treated</option>
-    <option value=" AND 'Facsur' = 6">Bituminous concrete</option>
-    <option value=" AND 'Facsur' = 7">Portland cement concrete</option><!--are only 6-->
-    <option value=" AND 'Facsur' = 10">Stone dust</option><!--only 12-->
-    </select>
-       </div></div><div id="map_canvas"></div>
-
- 
-    
- 
- 
- 
- 
+        </div>
+	<div id="tabs-2">
+   <select id="facStatus" onchange="changeMap();"><option value="">All Statuses</option></select>
+	<select id="facType" onchange="changeMap();"><option value="">All Types</option></select>
+		
+                </div>
+</div>
+<div id="legend"><b>Legend</b><ul style="list-type:circle;margin:0;padding-left:1em;paddding-top:0;"><li style="list-style-image:url(img/redline.png);">On-road marked lane</li><li style="list-style-image:url(img/orangeline.png);">On-road divided lane</li><li style="list-style-image:url(img/lightblue.png);">On-road sign-posted bike route</li><li style="list-style-image:url(img/redpurple.png);">Other On-road</li><li style="list-style-image:url(img/darkblue.png);">Off-road shared use path</li><li style="list-style-image:url(img/darkpurple.png);">Off-road Minimally improved path</li><li style="list-style-image:url(img/grey.png);">Unknown</li><li style="list-style-image:url(img/greenline.png);">Bay State Greenway</li></ul><a href="http://www.google.com/fusiontables/DataSource?dsrcid=3206745" target="_blank" tabindex="90">View on Google Fusion Tables</a><br/><a href="https://www.google.com/fusiontables/api/query?sql=SELECT+*+FROM+3206745" target="_blank" tabindex="95">Download the file</a></div>
+<a id="logo" href="http://www.massdot.state.ma.us/planning" target="_blank"><img src="img/otp.png" width="200" height="57" alt="logo and link home" border="0"/></a>
+<div id="map"></div>
 </body>
- 
 </html>
