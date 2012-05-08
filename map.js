@@ -29,6 +29,7 @@ greenWay = new google.maps.FusionTablesLayer(gwid);
  greenWay.setQuery("SELECT 'geometry' FROM " + gwid + " WHERE 'Preferred' ='Y'" );
   mainLayer.setQuery("SELECT 'geometry' FROM " + tid);
   greenWay.setMap(m);
+  greenWay.setOptions({suppressInfoWindows:true});
   mainLayer.setMap(m);
   }
 
