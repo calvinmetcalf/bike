@@ -1,11 +1,11 @@
 var m;
 var tid = 3831965;
-//var gwid = 1808742;
+var gwid = 3847334;
 var geocoder = new google.maps.Geocoder();
 var zoom = 8;
 var center = new google.maps.LatLng(42.04113400940814,-71.795654296875);
 var marker;
-var mainLayer/*,greenWay*/;
+var mainLayer,greenWay;
 
 $(function() {
         $( "#tabs" ).tabs({
@@ -24,12 +24,27 @@ function fusion() {
       zoom: zoom,
       mapTypeId: 'roadmap'
     });
-//greenWay = new google.maps.FusionTablesLayer(gwid);
+    
+ /*greenWay =   new google.maps.FusionTablesLayer({
+  query: {
+    select: 'geometry',
+    from: gwid,
+    where: "'Preferred' ='Y'"
+  },
+  styles: [{
+    polylineOptions: {
+      strokeColor: "#F6FF00",
+      strokeOpacity: 0.6,
+      strokeWeight:6
+    }
+  }]
+});*/
+greenWay = new google.maps.FusionTablesLayer(gwid);
  mainLayer = new google.maps.FusionTablesLayer(tid);
-// greenWay.setQuery("SELECT 'geometry' FROM " + gwid + " WHERE 'Preferred' ='Y'" );
-  mainLayer.setQuery("SELECT 'geometry' FROM " + tid);
-//  greenWay.setMap(m);
- // greenWay.setOptions({suppressInfoWindows:true});
+ greenWay.setQuery("SELECT 'geometry' FROM " + gwid + " WHERE 'Preferred' ='Y'" );
+  mainLayer.setQuery("SELECT 'geometry' FROM " + tid + " WHERE 'Status' like 'Constructed (existing)'");
+  greenWay.setMap(m);
+  greenWay.setOptions({suppressInfoWindows:true});
   mainLayer.setMap(m);
   }
 
@@ -63,6 +78,7 @@ marker.setMap(null);
 function popLists(){    
     MakePopList('NewType',getFacTypeData);
    MakePopList('Status',getStatusData);
+  
     }
 
 function MakePopList(columnName,callfunc){
@@ -84,14 +100,15 @@ var numRows = response.getDataTable().getNumberOfRows();
  var typeSelect = document.getElementById(selectID);  
   for(i = 0; i < numRows; i++) {
       var ftData = response.getDataTable().getValue(i, 0);
-      if (!ftData)
-     { continue;}
+     
     
-     else
-     { var newoption = document.createElement('option');
+     
+      var newoption = document.createElement('option');
       newoption.setAttribute('value',querryText + ftData + "'");
     newoption.innerHTML = ftData;
-    typeSelect.appendChild(newoption);}
+     if (ftData == 'Constructed (existing)')
+     { newoption.setAttribute("selected","selected");}
+    typeSelect.appendChild(newoption);
   }  
 }
 return getData;
