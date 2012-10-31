@@ -5,8 +5,7 @@ var m = new L.Map("map", {
 });
 new L.Hash(m);
 var mapQuestAttr = 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; ';
-var osmMapAttr = '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
-  var osmDataAttr = 'Map data ' + osmMapAttr;
+var osmDataAttr = 'Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 var opt = {
     url: 'http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.jpeg',
     options: {attribution:mapQuestAttr + osmDataAttr, subdomains:'1234'}
@@ -17,7 +16,7 @@ var bike=L.geoJson('',{style:style,onEachFeature:popUp}).addTo(m);
 $.get("bike.geojson",function(d){bike.addData(d);},"JSON");
 
 function style (f) {
-    var sopt={opacity:1,weight:3}
+    var sopt={opacity:1,weight:3};
     switch (f.properties.FacilityType) {
             case "Bike lane": sopt.color = "#ff0000"; return sopt;
             case "Shared use path":   sopt.color = "#00ff00"; return sopt;
@@ -35,7 +34,7 @@ function popUp(f,l){
     var out = [];
     if (f.properties){
         for(key in f.properties){
-            out.push(key+": "+f.properties[key])
+            out.push(key+": "+f.properties[key]);
         }
         l.bindPopup(out.join("<br />"));
     }
