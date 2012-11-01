@@ -16,7 +16,7 @@ var bike=L.geoJson('',{style:style,onEachFeature:popUp}).addTo(m);
 $.get("bike.geojson",function(d){bike.addData(d);},"JSON");
 
 function style (f) {
-    var sopt={opacity:1,weight:3};
+    var sopt={opacity:1,weight:3,clickable:true,stroke:true};
     switch (f.properties.FacilityType) {
             case "Bike lane": sopt.color = "#ff0000"; return sopt;
             case "Shared use path":   sopt.color = "#00ff00"; return sopt;
@@ -42,7 +42,7 @@ function popUp(f,l){
 function mQuery(q){
     var out = function (f){
         if(f.properties.FacilityType!==q){
-            return {clickable:false,fillOpacity:0,opacity:0};
+            return {clickable:false,stroke:false};
         }
     };
     return out;
@@ -69,7 +69,7 @@ $(function() {
             $("#selq").append('<option value="'+v+'">'+v+'</option>');
         });
         $("#selq").change(function(){
-            bike.eachLayer(function(l){bike.resetStyle(l);})
+            bike.eachLayer(function(l){bike.resetStyle(l);});
             var val = $("#selq").val();
             if(val && val!=="all"){
                 bike.setStyle(mQuery(val));
