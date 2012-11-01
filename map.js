@@ -39,3 +39,41 @@ function popUp(f,l){
         l.bindPopup(out.join("<br />"));
     }
 }
+function mQuery(q){
+    var out = function (f){
+        if(f.properties.FacilityType!==q){
+            return {clickable:false,fillOpacity:0,opacity:0};
+        }
+    };
+    return out;
+}
+$(function() {
+    var select='<div id="tabs"><ul><li><a href="#query">Query</a></li></ul><div id="query"><select id="selq"><option value="all">All Types</option></select></div></div>';
+    $('body').prepend(select);
+    $( "#tabs" ).tabs({
+            collapsible: true,
+            selected: -1
+    });
+    var all = [
+            "Bike lane"
+            ,"Shared use path"
+            ,"To be determined (retired type - hold for future use, use for unknown faciliy)"
+            ,"Marked shared lane"
+            ,"Sign-posted on-road bike route (with no other accommodation on the road surface)"
+            ,"Bicycle/Pedestrian priority roadway"
+            ,"Usable bike shoulder (4-5 foot min./moderate volume/speed road, locally identified as a bike facility)"
+            ,"Hybrid (raod segment with different treatments in each direction of travel)"
+            ,"Cycle track"
+        ];
+        $.each(all,function(_i,v){
+            $("#selq").append('<option value="'+v+'">'+v+'</option>');
+        });
+        $("#selq").change(function(){
+            bike.eachLayer(function(l){bike.resetStyle(l);})
+            var val = $("#selq").val();
+            if(val && val!=="all"){
+                bike.setStyle(mQuery(val));
+                
+            }
+            });
+});
