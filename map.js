@@ -49,7 +49,7 @@ function mQuery(q){
     return out;
 }
 $(function() {
-    var select='<div id="tabs"><ul><li><a href="#search">search</a></li><li><a href="#query">Query</a></li></ul> <div id="search"><form id="geocoder"><input type="text" class="tbox" id="address" placeholder="Enter an Address or LatLong" /><input type="submit" value="Search" id="geocode"/><input type="reset" value="Reset" id="resetgeo"/></form></div><div id="query"><select id="selq"><option value="all">All Types</option></select></div></div>';
+    var select='<div id="tabs"><ul><li><a href="#search">Search</a></li><li><a href="#query">Query</a></li></ul> <div id="search"><form id="geocoder"><input type="text" class="tbox" id="address" placeholder="Enter an Address or LatLong" /><input type="submit" value="Search" id="geocode"/><input type="reset" value="Reset" id="resetgeo"/></form></div><div id="query"><select id="selq"><option value="all">All Types</option></select></div></div>';
     $('body').prepend(select);
     $( "#tabs" ).tabs({
             collapsible: true,
