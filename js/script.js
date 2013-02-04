@@ -83,7 +83,7 @@ function onEachFeature(ft,layer) {
     if (ft.attributes) {
     	var out = [];
         for(var key in ft.attributes){
-        	if(!_.contains(['geometry','id','type','Shape_Length'],key)){
+        	if(!_.contains(['geometry','id','_id','type','Shape_Length'],key)){
         			out.push(key + ": "+ft.attributes[key]);
         	}
         }
