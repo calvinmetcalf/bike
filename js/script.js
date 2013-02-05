@@ -1,4 +1,3 @@
-
 var bikessrc;
 if (L.Browser.vml){
 bikessrc = "json/bikes-rm.json";
@@ -14,6 +13,7 @@ var ft = Backbone.Model.extend({
 			this.set(props);
 		}
 		this.unset("properties");
+		this.leaflet=this.toMap();
 		this.onMap=false;
 	},
 	toMap:function(){
@@ -23,15 +23,17 @@ var ft = Backbone.Model.extend({
 	},
 	addTo:function(m){
 		if(!this.onMap){
-			this.toMap().addTo(m);
+			this.leaflet.addTo(m);
 			this.onMap=true;
 		}
+		return this;
 	},
 	rmFrom : function(m){
 		if(this.onMap){
-			m.removeLayer(this.toMap());
+			m.removeLayer(this.leaflet);
 			this.onMap=false;
 		}
+		return this;
 	}
 });
 var Bikes = Backbone.Collection.extend({
@@ -41,31 +43,60 @@ var bikes = new Bikes;
 $.get(bikessrc,function(d){
 	bikes.add(d.features);
 map.render();
+statusSelect.render();
+typeSelect.render();
 	},"json");
 	
 MapView = Backbone.View.extend({
 	initialize:function(){
 	this.render = this.options.render;
+	if(this.options.template){
+		this.template = (Mustache.compile(this.options.template));
+	}
 	},
 	query:{},
 	collection:bikes,
-	queriedCollection : function(){
-		if(Object.keys(this.query).length===0){
-			return this.collection.models;
-		}else{
-			return this.collection.where(this.query);
-		}
-	}
 });
 var map = new MapView({	
 	tag:"div",
 	id:"map",
 	render : function(){
-	
-	_.each(this.queriedCollection(),function(v){
+
+	_.each(this.collection.models,function(v){
+	var add = true;
+		for(var key in this.query){
+			if(v.get(key)!==this.query[key]){
+				add=false;
+			}
+		}
+		if(add){
 		
 			v.addTo(m);
-		});
+		}else{
+	
+			v.rmFrom(m);
+		}
+		},this);
+	}
+});
+var statusSelect = new MapView({
+	el : $("#statusSelect"),
+	template : "<option value='all'>All Statuses</option>{{#statuses}}<option value='{{status}}'>{{status}}</option>{{/statuses}}",
+	render : function(){
+		this.$el.html(this.template({statuses:_.map(_.map(_.uniq(this.collection.pluck("FacilityStatus")),function(v){return v.slice(0,v.indexOf(":"))}).sort(),function(v){return {status:v}})}));
+	}
+});
+var typeSelect = new MapView({
+	el : $("#typeSelect"),
+	template : "<option value='all'>All Types</option>{{#types}}<option value='{{status}}'>{{type}}</option>{{/types}}",
+	render : function(){
+		this.$el.html(this.template({types:_.map(_.map(_.uniq(this.collection.pluck("FacilityType")),function(v){
+			if(v.indexOf("(")===-1){
+				return v;
+			}else{
+			return v.slice(0,v.indexOf("("));
+			}
+			}).sort(),function(v){return {type:v}})}));
 	}
 });
 var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
@@ -152,3 +183,20 @@ function style(doc) {
     }
 
 m.addHash();
+ $(function(){
+            var mapmargin = parseInt($("#map").css("margin-top"), 10);
+      $('#map').css("height", ($(window).height() - mapmargin));
+      $(window).on("resize", function(e){
+        $('#map').css("height", ($(window).height() - mapmargin));
+           if($(window).width()>=980){
+      	$('#map').css("margin-top",40);
+      }else{
+      		$('#map').css("margin-top",-20);
+      }
+      });
+      if($(window).width()>=980){
+      	$('#map').css("margin-top",40);
+      }else{
+      		$('#map').css("margin-top",-20);
+      }
+            });

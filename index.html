@@ -7,13 +7,20 @@
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/bootstrap.min.css" rel="stylesheet">
 <style>
-html { height: 100% }
-body { height: 100%; margin: 0; padding: 0; }
-  #map{ height: 100%; padding-top:0em;}
-  .bikes{
-  	z-index:10000;
-  	margin-left:20px;
-  }
+html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        overflow:hidden;
+      
+       }
+      #map {
+       margin-top: 40px;
+        width:100%;
+     height: 100%;
+      }
 </style>
          <!--[if lte IE 8]>
 
@@ -23,20 +30,26 @@ body { height: 100%; margin: 0; padding: 0; }
         <![endif]-->
     </head>
     <body>
-        <div id="map" class="container-fluid"><div class="btn-group bikes">
-<button class="btn btn-primary">Type</button>
-  <button class="btn dropdown-toggle btn-info" data-toggle="dropdown">
-   Status <span class="caret"></span>
-  </button>
-   
-  <ul class="dropdown-menu">
-  <li>  <a href="#">Status 1</a>  </li> 
-    <li>  <a href="#">Status 2</a>  </li> 
-  </ul>
-
+     <div class="navbar  navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="http://www.massdot.state.ma.us/GreenDOT.aspx" target="_blank">GreenDOT</a>
+          <div class="nav-collapse collapse">
+        <form class="navbar-form pull-left">
+              <select id="statusSelect"></select><select id="typeSelect"></select>
   
-</div></div>
-            
+</select></form>
+           
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div> <div class="container" id='map'></div>
+           
             <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/leaflet.js"></script>
         <script type="text/javascript" src="js/leaflet.css.js"></script>
@@ -50,6 +63,7 @@ body { height: 100%; margin: 0; padding: 0; }
         <script type="text/javascript" src="js/lodash.min.js"></script>
          <script type="text/javascript" src="js/backbone.js"></script>
         <script type="text/javascript" src="js/pouchdb.nightly.js"></script>
+        <script type="text/javascript" src="js/mustache.js"></script>
         <script type="text/javascript" src="js/script.js"></script>
         <script type="text/javascript">
             var _gaq = _gaq || [];
