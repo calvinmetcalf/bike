@@ -4,7 +4,7 @@ bikessrc = "json/bikes-rm.json";
 }else{
 bikessrc = "json/bikes.json";
 }
-var dd;
+var dd=[];
 
 var ft = Backbone.Model.extend({
 	initialize:function(){
@@ -37,7 +37,8 @@ var ft = Backbone.Model.extend({
 	}
 });
 var Bikes = Backbone.Collection.extend({
-  model: ft
+  model: ft,
+  query:{}
 });
 var bikes = new Bikes;
 $.get(bikessrc,function(d){
@@ -52,20 +53,29 @@ MapView = Backbone.View.extend({
 	this.render = this.options.render;
 	if(this.options.template){
 		this.template = (Mustache.compile(this.options.template));
-	}
-	},
-	query:{},
+	}else{
+	this.collection.on("change:_cwm",this.render,this);
+	}},
 	collection:bikes,
+	selectChanged:function(e){
+		if(e.target.value === "all"){
+			if(this.collection.query[e.target.id]){
+				delete this.collection.query[e.target.id];
+			}
+		}else{
+			this.collection.query[e.target.id] = e.target.value;
+		}
+		this.collection.at(0).set("_cwm",Math.random());
+	}
 });
 var map = new MapView({	
-	tag:"div",
-	id:"map",
+	el :$("map"),
 	render : function(){
 
 	_.each(this.collection.models,function(v){
 	var add = true;
-		for(var key in this.query){
-			if(v.get(key)!==this.query[key]){
+		for(var key in this.collection.query){
+			if(v.get(key)!==this.collection.query[key]){
 				add=false;
 			}
 		}
@@ -77,26 +87,39 @@ var map = new MapView({
 			v.rmFrom(m);
 		}
 		},this);
+	},
+	events:{
+		"queryChanged div":"render"
 	}
 });
+
 var statusSelect = new MapView({
-	el : $("#statusSelect"),
-	template : "<option value='all'>All Statuses</option>{{#statuses}}<option value='{{status}}'>{{status}}</option>{{/statuses}}",
+	el : $("#FacilityStatus"),
+	template : "<option value='all'>All Statuses</option>{{#statuses}}<option value='{{statusFull}}'>{{status}}</option>{{/statuses}}",
 	render : function(){
-		this.$el.html(this.template({statuses:_.map(_.map(_.uniq(this.collection.pluck("FacilityStatus")),function(v){return v.slice(0,v.indexOf(":"))}).sort(),function(v){return {status:v}})}));
+		
+		this.$el.html(this.template({statuses:_.map(_.uniq(this.collection.pluck("FacilityStatus")).sort(),function(v){return {statusFull : v,status:v.slice(0,v.indexOf(":"))}})}));
+	},
+	events:{
+		"change":"selectChanged"
 	}
 });
 var typeSelect = new MapView({
-	el : $("#typeSelect"),
-	template : "<option value='all'>All Types</option>{{#types}}<option value='{{status}}'>{{type}}</option>{{/types}}",
+	el : $("#FacilityType"),
+	template : "<option value='all'>All Types</option>{{#types}}<option value='{{fullType}}'>{{type}}</option>{{/types}}",
 	render : function(){
-		this.$el.html(this.template({types:_.map(_.map(_.uniq(this.collection.pluck("FacilityType")),function(v){
+		this.$el.html(this.template({types:_.map(_.uniq(this.collection.pluck("FacilityType")).sort(),function(v){
 			if(v.indexOf("(")===-1){
-				return v;
+				return {type:v,fullType:v};
 			}else{
-			return v.slice(0,v.indexOf("("));
+			return {
+				type:v.slice(0,v.indexOf("(")),
+				fullType:v};
 			}
-			}).sort(),function(v){return {type:v}})}));
+			})}));
+	},
+	events:{
+		"change":"selectChanged"
 	}
 });
 var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
@@ -114,7 +137,7 @@ function onEachFeature(ft,layer) {
     if (ft.attributes) {
     	var out = [];
         for(var key in ft.attributes){
-        	if(!_.contains(['geometry','id','_id','type','Shape_Length'],key)){
+        	if(!_.contains(['geometry','id','_id','type','Shape_Length',"_cwm"],key)){
         			out.push(key + ": "+ft.attributes[key]);
         	}
         }
