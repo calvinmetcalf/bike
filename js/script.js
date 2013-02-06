@@ -1,6 +1,6 @@
 var bikessrc;
 if (L.Browser.vml){
-bikessrc = "json/bikes-rm.json";
+bikessrc = "json/bikes-xrm.json";
 }else{
 bikessrc = "json/bikes.json";
 }
