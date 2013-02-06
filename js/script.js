@@ -5,7 +5,7 @@ bikessrc = "json/bikes-rm.json";
 bikessrc = "json/bikes.json";
 }
 var dd=[];
-
+var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
 var ft = Backbone.Model.extend({
 	initialize:function(){
 		props=this.get("properties");
@@ -22,25 +22,22 @@ var ft = Backbone.Model.extend({
 		return layer;
 	},
 	addTo:function(m){
-		if(!this.onMap){
-			this.leaflet.addTo(m);
-			this.onMap=true;
-		}
+		this.leaflet.addTo(m);
 		return this;
 	},
 	rmFrom : function(m){
-		if(this.onMap){
-			m.removeLayer(this.leaflet);
-			this.onMap=false;
-		}
+		m.removeLayer(this.leaflet);
 		return this;
 	}
 });
 var Bikes = Backbone.Collection.extend({
-  model: ft,
-  query:{}
+    model: ft,
+    query:{},
+    initialize:function(){
+        this.featureGroup = L.featureGroup().addTo(m);
+    }
 });
-var bikes = new Bikes;
+var bikes = new Bikes();
 $.get(bikessrc,function(d){
 	bikes.add(d.features);
 map.render();
@@ -71,22 +68,13 @@ MapView = Backbone.View.extend({
 var map = new MapView({	
 	el :$("map"),
 	render : function(){
-
-	_.each(this.collection.models,function(v){
-	var add = true;
-		for(var key in this.collection.query){
-			if(v.get(key)!==this.collection.query[key]){
-				add=false;
-			}
-		}
-		if(add){
-		
-			v.addTo(m);
-		}else{
-	
-			v.rmFrom(m);
-		}
-		},this);
+		this.collection.featureGroup.clearLayers();
+    if(Object.keys(this.collection.query).length === 0){
+    	_.each(this.collection.models,function(v){v.addTo(this.collection.featureGroup)},this);
+    }else{
+    	_.each(this.collection.where(this.collection.query),function(v){v.addTo(this.collection.featureGroup)},this);
+    }
+	return this;
 	},
 	events:{
 		"queryChanged div":"render"
@@ -99,6 +87,7 @@ var statusSelect = new MapView({
 	render : function(){
 		
 		this.$el.html(this.template({statuses:_.map(_.uniq(this.collection.pluck("FacilityStatus")).sort(),function(v){return {statusFull : v,status:v.slice(0,v.indexOf(":"))}})}));
+		return this;
 	},
 	events:{
 		"change":"selectChanged"
@@ -117,12 +106,13 @@ var typeSelect = new MapView({
 				fullType:v};
 			}
 			})}));
+		return this;
 	},
 	events:{
 		"change":"selectChanged"
 	}
 });
-var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
+
 var baseMaps = [
     "MapQuestOpen.OSM",
     "OpenStreetMap.Mapnik",
