@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-    <head>
+    <head><meta charset="utf-8">
         <title>
             Bikes
         </title>
@@ -51,7 +51,7 @@ html, body {
     </div> <div class="container" id='map'></div>
            
             <script type="text/javascript" src="js/jquery.min.js"></script>
-        <script type="text/javascript" src="js/leaflet.js"></script>
+        <script type="text/javascript" src="js/leaflet-src.js"></script>
         <script type="text/javascript" src="js/leaflet.css.js"></script>
          <script type="text/javascript" src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/rrose.js"></script>
@@ -64,7 +64,30 @@ html, body {
          <script type="text/javascript" src="js/backbone.js"></script>
         <script type="text/javascript" src="js/pouchdb.nightly.js"></script>
         <script type="text/javascript" src="js/mustache.js"></script>
-        <script type="text/javascript" src="js/script.js"></script>
+        <script type="text/javascript" src="js/d3.v3.js"></script>
+        <script type="text/javascript" src="js/topojson.v0.js"></script>
+            <script type="text/javascript" src="js/script.js"></script>
+       <!-- <script type="text/javascript" src="js/coffee-script.js"></script>
+         <script type="text/coffeescript" src="coffee/script.coffee"></script>-->
+         <script type="text/javascript">
+         	$(function(){
+            var mapmargin = parseInt($("#map").css("margin-top"), 10);
+      $('#map').css("height", ($(window).height() - mapmargin));
+      $(window).on("resize", function(e){
+        $('#map').css("height", ($(window).height() - mapmargin));
+           if($(window).width()>=980){
+      	$('#map').css("margin-top",40);
+      }else{
+      		$('#map').css("margin-top",-20);
+      }
+      });
+      if($(window).width()>=980){
+      	$('#map').css("margin-top",40);
+      }else{
+      		$('#map').css("margin-top",-20);
+      }
+            });
+         </script>
         <script type="text/javascript">
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', 'UA-31218444-1']);

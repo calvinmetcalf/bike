@@ -1,10 +1,10 @@
 var bikessrc;
 if (L.Browser.vml){
-bikessrc = "json/bikes-xrm.json";
+bikessrc = "json/disolve6.json";
 }else{
 bikessrc = "json/bikes.json";
 }
-var dd=[];
+var b = [];
 var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
 var ft = Backbone.Model.extend({
 	initialize:function(){
@@ -17,7 +17,19 @@ var ft = Backbone.Model.extend({
 		this.onMap=false;
 	},
 	toMap:function(){
-		layer = L.polyline(this.get('geometry').coordinates.map(function(v){return [v[1],v[0]]}),style(this.attributes));
+		var coords = this.get('geometry').coordinates;
+		var layer;
+		if(coords.every(function(v){return v.length === 2})){
+			layer = L.polyline(coords.map(function(v){
+				return [v[1],v[0]];
+				}),style(this.attributes));
+		}else{
+		layer = L.multiPolyline(coords.map(function(vv){
+			return vv.map(function(v){
+				return [v[1],v[0]];
+				});
+			}),style(this.attributes));
+		}
 		onEachFeature(this,layer);
 		return layer;
 	},
@@ -38,12 +50,13 @@ var Bikes = Backbone.Collection.extend({
     }
 });
 var bikes = new Bikes();
-$.get(bikessrc,function(d){
-	bikes.add(d.features);
+d3.json(bikessrc, function(error, dd){
+	bikes.add(dd.features);
+
 map.render();
 statusSelect.render();
 typeSelect.render();
-	},"json");
+	});
 	
 MapView = Backbone.View.extend({
 	initialize:function(){
@@ -121,7 +134,7 @@ var baseMaps = [
     "Stamen.TerrainBackground",
     "Stamen.Watercolor",
 ];
-L.control.layers.filled(baseMaps,{},{map:m});
+var lc = L.control.layers.filled(baseMaps,{},{map:m});
 function onEachFeature(ft,layer) {
     // does this feature have a property named popupContent?
     if (ft.attributes) {
@@ -195,7 +208,7 @@ function style(doc) {
         return out;
     }
 
-m.addHash();
+m.addHash({lc:lc});
  $(function(){
             var mapmargin = parseInt($("#map").css("margin-top"), 10);
       $('#map').css("height", ($(window).height() - mapmargin));
