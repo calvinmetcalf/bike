@@ -23,13 +23,13 @@ var ft = Backbone.Model.extend({
 		if(geom.type==="LineString"){
 			layer = L.polyline(coords.map(function(v){
 				return [v[1],v[0]];
-				}),style(this.attributes));
+				})/*,style(this.attributes)*/);
 		}else{
 		layer = L.multiPolyline(coords.map(function(vv){
 			return vv.map(function(v){
 				return [v[1],v[0]];
 				});
-			}),style(this.attributes));
+			})/*,style(this.attributes)*/);
 		}
 		onEachFeature(this,layer);
 		return layer;
