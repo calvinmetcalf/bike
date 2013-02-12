@@ -4,7 +4,7 @@ bikessrc = "json/disolve9.json";
 }else{
 bikessrc = "json/bikes.json";
 }
-var b = [];
+//var b = [];
 var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
 var ft = Backbone.Model.extend({
 	initialize:function(){
@@ -17,18 +17,19 @@ var ft = Backbone.Model.extend({
 		this.onMap=false;
 	},
 	toMap:function(){
-		var coords = this.get('geometry').coordinates;
+		var geom = this.get('geometry');
+		var coords = geom.coordinates;
 		var layer;
-		if(coords.every(function(v){return v.length === 2})){
+		if(geom.type==="LineString"){
 			layer = L.polyline(coords.map(function(v){
 				return [v[1],v[0]];
-				})/*,style(this.attributes)*/);
+				}),style(this.attributes));
 		}else{
 		layer = L.multiPolyline(coords.map(function(vv){
 			return vv.map(function(v){
 				return [v[1],v[0]];
 				});
-			})/*,style(this.attributes)*/);
+			}),style(this.attributes));
 		}
 		onEachFeature(this,layer);
 		return layer;
