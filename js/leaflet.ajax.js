@@ -39,11 +39,18 @@ L.GeoJSON.AJAX=L.GeoJSON.extend({
     _this.addUrl(url);
     },
     refilter:function (func){
-        this.clearLayers();
         if(typeof func !== "function"){
-            this.addData(this._cache);
+        	this.eachLayer(function(a){
+				a.setStyle({stroke:true,clickable:true});
+			});
         }else{
-            this.addData(this._cache.filter(func));
+        	this.eachLayer(function(a){
+        		if(func(a.feature)){
+					a.setStyle({stroke:true,clickable:true});
+				}else{
+					a.setStyle({stroke:false,clickable:false});
+				}
+			});
         }
     }
 });
@@ -96,7 +103,7 @@ L.Util.jsonp = function (url, cb, cbParam, callbackName){
     if(cbSuffix) {
         L.Util.jsonp.cb[cbSuffix] = function(data){
             head.removeChild(scriptNode);
-            delete L.Util.jsonp.cb[cbSuffix]
+            delete L.Util.jsonp.cb[cbSuffix];
             cb(data);
         };
     }

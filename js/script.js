@@ -5,127 +5,7 @@ bikessrc = "json/disolve9.json";
 bikessrc = "json/bikes.json";
 }
 //var b = [];
-var m = L.map('map').setView([42.35904337942925, -71.06178045272827], 18);
-var ft = Backbone.Model.extend({
-	initialize:function(){
-		props=this.get("properties");
-		if(props){
-			this.set(props);
-		}
-		this.unset("properties");
-		this.leaflet=this.toMap();
-		this.onMap=false;
-	},
-	toMap:function(){
-		var geom = this.get('geometry');
-		var coords = geom.coordinates;
-		var layer;
-		if(geom.type==="LineString"){
-			layer = L.polyline(coords.map(function(v){
-				return [v[1],v[0]];
-				})/*,style(this.attributes)*/);
-		}else{
-		layer = L.multiPolyline(coords.map(function(vv){
-			return vv.map(function(v){
-				return [v[1],v[0]];
-				});
-			})/*,style(this.attributes)*/);
-		}
-		onEachFeature(this,layer);
-		return layer;
-	},
-	addTo:function(m){
-		this.leaflet.addTo(m);
-		return this;
-	},
-	rmFrom : function(m){
-		m.removeLayer(this.leaflet);
-		return this;
-	}
-});
-var Bikes = Backbone.Collection.extend({
-    model: ft,
-    query:{},
-    initialize:function(){
-        this.featureGroup = L.featureGroup().addTo(m);
-    }
-});
-var bikes = new Bikes();
-d3.json(bikessrc, function(error, dd){
-	bikes.add(dd.features);
-
-map.render();
-statusSelect.render();
-typeSelect.render();
-	});
-	
-MapView = Backbone.View.extend({
-	initialize:function(){
-	this.render = this.options.render;
-	if(this.options.template){
-		this.template = (Mustache.compile(this.options.template));
-	}else{
-	this.collection.on("change:_cwm",this.render,this);
-	}},
-	collection:bikes,
-	selectChanged:function(e){
-		if(e.target.value === "all"){
-			if(this.collection.query[e.target.id]){
-				delete this.collection.query[e.target.id];
-			}
-		}else{
-			this.collection.query[e.target.id] = e.target.value;
-		}
-		this.collection.at(0).set("_cwm",Math.random());
-	}
-});
-var map = new MapView({	
-	el :$("map"),
-	render : function(){
-		this.collection.featureGroup.clearLayers();
-    if(Object.keys(this.collection.query).length === 0){
-    	_.each(this.collection.models,function(v){v.addTo(this.collection.featureGroup)},this);
-    }else{
-    	_.each(this.collection.where(this.collection.query),function(v){v.addTo(this.collection.featureGroup)},this);
-    }
-	return this;
-	},
-	events:{
-		"queryChanged div":"render"
-	}
-});
-
-var statusSelect = new MapView({
-	el : $("#FacilityStatus"),
-	template : "<option value='all'>All Statuses</option>{{#statuses}}<option value='{{statusFull}}'>{{status}}</option>{{/statuses}}",
-	render : function(){
-		
-		this.$el.html(this.template({statuses:_.map(_.uniq(this.collection.pluck("FacilityStatus")).sort(),function(v){return {statusFull : v,status:v.slice(0,v.indexOf(":"))}})}));
-		return this;
-	},
-	events:{
-		"change":"selectChanged"
-	}
-});
-var typeSelect = new MapView({
-	el : $("#FacilityType"),
-	template : "<option value='all'>All Types</option>{{#types}}<option value='{{fullType}}'>{{type}}</option>{{/types}}",
-	render : function(){
-		this.$el.html(this.template({types:_.map(_.uniq(this.collection.pluck("FacilityType")).sort(),function(v){
-			if(v.indexOf("(")===-1){
-				return {type:v,fullType:v};
-			}else{
-			return {
-				type:v.slice(0,v.indexOf("(")),
-				fullType:v};
-			}
-			})}));
-		return this;
-	},
-	events:{
-		"change":"selectChanged"
-	}
-});
+var m = L.map('map').setView([41.9360,-71.6611], 9);
 
 var baseMaps = [
     "MapQuestOpen.OSM",
@@ -135,26 +15,25 @@ var baseMaps = [
     "Stamen.TerrainBackground",
     "Stamen.Watercolor",
 ];
-var lc = L.control.layers.filled(baseMaps,{},{map:m});
+var bikes = L.geoJson.ajax(bikessrc,{style:style,onEachFeature:onEachFeature}).addTo(m);
+var lc = L.control.layers.filled(baseMaps,{"bikes":bikes},{map:m});
+var popupTemplate=Mustache.compile('<ul>{{#items}}<li><strong>{{key}}</strong>: {{value}}</li>{{/items}}</ul>');
 function onEachFeature(ft,layer) {
-    // does this feature have a property named popupContent?
-    if (ft.attributes) {
-    	var out = [];
-        for(var key in ft.attributes){
-        	if(!_.contains(['geometry','id','_id','type','Shape_Length',"_cwm"],key)){
-        			out.push(key + ": "+ft.attributes[key]);
+    if (ft.properties) {
+    	var out = {items:[]},val;
+        for(var key in ft.properties){
+        	if(['geometry','id','_id','type','Shape_Length',"_cwm"].indexOf(key)===-1){
+        		val = ft.properties[key].replace(/\+.+\+/g,"");
+        		if(val&&val!==""){
+        			out.items.push({key:key.replace(/([a-z])([A-Z])/g,"$1 $2"),value:val});
+        }
         	}
         }
-        layer.on('click', function(e){
-    L.rrose({ autoPan: false })
-      .setContent(out.join("<br/>"))
-      .setLatLng(e.latlng)
-      .openOn(m);
-  });
+        layer.bindPopup(popupTemplate(out));
     }
 }
 function style(doc) {
-		var status = doc.FacilityStatus.slice(0,doc.FacilityStatus.indexOf(":"));
+		var status = doc.properties.FacilityStatus.slice(0,doc.properties.FacilityStatus.indexOf(":"));
 		out = {opacity:0.9};
         switch (status) {
             case 'Existing':
@@ -172,7 +51,7 @@ function style(doc) {
             	out.dashArray = "3, 20"
             	break;
         }
-        var facT = doc.FacilityType
+        var facT = doc.properties.FacilityType
 		var pn = facT.indexOf("(")
 		if( pn>0 ){
 				facT = facT.slice(0,pn)
@@ -208,6 +87,54 @@ function style(doc) {
 		}
         return out;
     }
+var dropdowns = {"status":[{"value":"Existing: Facility is open for use","display":"Existing"},{"value":"In design: Currently in design review by MassDOT or under design locally","display":"In design"},{"value":"Under construction: Facility is actively being built, under contract for construction or advertised for construction","display":"Under construction"},{"value":"Planned: Programmed in STIP, feasability being studied or local design funds encumbered/earmarked","display":"Planned"}],"type":[{"value":"Shared use path","display":"Shared use path"},{"value":"Bike lane","display":"Bike lane"},{"value":"Sign-posted on-road bike route (with no other accommodation on the road surface)","display":"Sign-posted on-road bike route"},{"value":"Paved bike shoulder (4-5 foot min./moderate volume/speed road, locally identified as a bike facility)","display":"Paved bike shoulder"},{"value":"Bicycle/Pedestrian priority roadway","display":"Bicycle/Pedestrian priority roadway"},{"value":"On-Road - To Be Determined","display":"On-Road - To Be Determined"},{"value":"Hybrid (road segment with different treatments in each direction of travel)","display":"Hybrid"},{"value":"Marked shared lane","display":"Marked shared lane"},{"value":"Cycle track","display":"Cycle track"}]};
+var statusTemplate=Mustache.compile('<option>All Statuses</option>\
+{{#status}}\
+<option value="{{value}}">{{display}}</options>\
+{{/status}}');
+var typeTemplate=Mustache.compile('<option>All Types</option>\
+{{#type}}\
+<option value="{{value}}">{{display}}</options>\
+{{/type}}');
+$("#FacilityStatus").html(statusTemplate(dropdowns));
+$("#FacilityType").html(typeTemplate(dropdowns));
+
+var state=[];
+$("select").change(function(){
+	var situation = 0;
+	var newState=[$("#FacilityType").val(), $("#FacilityStatus").val()];
+	if(state[0]===newState[0]&&state[1]===newState[1]){
+		return;
+	}
+	state=newState;
+	if(state[0]!=="All Types"){
+		situation++;
+	}
+	if(state[1]!=="All Statuses"){
+		situation++;
+		situation++;
+	}
+	switch(situation){
+		case 0:
+			bikes.refilter();
+			return false;
+		case 1:
+			bikes.refilter(function(a){
+				return a.properties.FacilityType===state[0];
+			});
+			return false;
+		case 2:
+			bikes.refilter(function(a){
+				return a.properties.FacilityStatus===state[1];
+			});
+			return;
+		case 3:
+			bikes.refilter(function(a){
+				return a.properties.FacilityType===state[0]&&a.properties.FacilityStatus===state[1];
+			});
+			return false;
+	}
+});
 
 m.addHash({lc:lc});
  $(function(){
