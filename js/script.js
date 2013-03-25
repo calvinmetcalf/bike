@@ -1,12 +1,35 @@
-var bikessrc;
-if (L.Browser.vml){
-bikessrc = "json/bikes-xrm.json";
-}else{
-bikessrc = "json/bikes.json";
-}
+L.Control.Layers.prototype._addItem= function (obj) {
+    	var label = document.createElement('label'),
+		    input,
+		    checked = this._map.hasLayer(obj.layer);
+
+		if (obj.overlay) {
+			input = document.createElement('input');
+			input.type = 'checkbox';
+			input.className = 'leaflet-control-layers-selector';
+			input.defaultChecked = checked;
+		} else {
+			input = this._createRadioElement('leaflet-base-layers', checked);
+		}
+
+		input.layerId = L.stamp(obj.layer);
+
+		L.DomEvent.on(input, 'click', this._onInputClick, this);
+
+		var name = document.createElement('span');
+		name.innerHTML = ' ' + obj.name;
+
+		label.appendChild(input);
+		label.appendChild(name);
+        label.className = obj.overlay ? "checkbox" : "radio";
+		var container = obj.overlay ? this._overlaysList : this._baseLayersList;
+		container.appendChild(label);
+
+		return label;
+	}
+
 //var b = [];
 var m = L.map('map').setView([41.9360,-71.6611], 9);
-
 var baseMaps = [
     "MapQuestOpen.OSM",
     "OpenStreetMap.Mapnik",
@@ -15,7 +38,8 @@ var baseMaps = [
     "Stamen.TerrainBackground",
     "Stamen.Watercolor",
 ];
-var bikes = L.geoJson.ajax(bikessrc,{style:style,onEachFeature:onEachFeature}).addTo(m);
+var bikes = L.geoJson.ajax(L.Browser.vml?"json/bikes-xrm.json":"json/bikes.json",{style:style,onEachFeature:onEachFeature}).addTo(m);
+
 var lc = L.control.layers.filled(baseMaps,{"bikes":bikes},{map:m});
 var popupTemplate=Mustache.compile('<ul>{{#items}}<li><strong>{{key}}</strong>: {{value}}</li>{{/items}}</ul>');
 function onEachFeature(ft,layer) {
