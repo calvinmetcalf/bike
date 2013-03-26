@@ -1,7 +1,7 @@
 L.Control.Layers.prototype._addItem= function (obj) {
-    	var label = document.createElement('label'),
-		    input,
-		    checked = this._map.hasLayer(obj.layer);
+		var label = document.createElement('label'),
+			input,
+			checked = this._map.hasLayer(obj.layer);
 
 		if (obj.overlay) {
 			input = document.createElement('input');
@@ -21,7 +21,7 @@ L.Control.Layers.prototype._addItem= function (obj) {
 
 		label.appendChild(input);
 		label.appendChild(name);
-        label.className = obj.overlay ? "checkbox" : "radio";
+		label.className = obj.overlay ? "checkbox" : "radio";
 		var container = obj.overlay ? this._overlaysList : this._baseLayersList;
 		container.appendChild(label);
 
@@ -31,34 +31,34 @@ L.Control.Layers.prototype._addItem= function (obj) {
 //var b = [];
 var m = L.map('map').setView([41.9360,-71.6611], 9);
 var baseMaps = [
-    "MapQuestOpen.OSM",
-    "OpenStreetMap.Mapnik",
-    "OpenStreetMap.DE",
-    "Esri.WorldImagery",
-    "Stamen.TerrainBackground",
-    "Stamen.Watercolor",
+	"MapQuestOpen.OSM",
+	"OpenStreetMap.Mapnik",
+	"OpenStreetMap.DE",
+	"Esri.WorldImagery",
+	"Stamen.TerrainBackground",
+	"Stamen.Watercolor",
 ];
 function getURL(){
 	//L.Browser.vml?"json/bikes-xrm.json":"json/bikes.json"
-	return "https://gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString();
+	return "https://gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString()+"&simplify="+getRes();
 }
 var bikes = L.geoJson.ajax(getURL(),{style:style,onEachFeature:onEachFeature,dataType:"jsonp"}).addTo(m);
 
 var lc = L.control.layers.filled(baseMaps,{"bikes":bikes},{map:m});
 var popupTemplate=Mustache.compile('<ul>{{#items}}<li><strong>{{key}}</strong>: {{value}}</li>{{/items}}</ul>');
 function onEachFeature(ft,layer) {
-    if (ft.properties) {
-    	var out = {items:[]},val;
-        for(var key in ft.properties){
-        	if(['geometry','id','_id','type','Shape_Length',"_cwm"].indexOf(key)===-1){
-        		val = ft.properties[key].replace(/\+.+\+/g,"");
-        		if(val&&val!==""){
-        			out.items.push({key:key.replace(/([a-z])([A-Z])/g,"$1 $2"),value:val});
-        }
-        	}
-        }
-        layer.bindPopup(popupTemplate(out));
-    }
+	if (ft.properties) {
+		var out = {items:[]},val;
+		for(var key in ft.properties){
+			if(['geometry','id','_id','type','Shape_Length',"_cwm"].indexOf(key)===-1){
+				val = ft.properties[key].replace(/\+.+\+/g,"");
+				if(val&&val!==""){
+					out.items.push({key:key.replace(/([a-z])([A-Z])/g,"$1 $2"),value:val});
+		}
+			}
+		}
+		layer.bindPopup(popupTemplate(out));
+	}
 }
 m.on("moveend",function(){
 	bikes.refresh(getURL());
@@ -66,23 +66,23 @@ m.on("moveend",function(){
 function style(doc) {
 		var status = doc.properties.FacilityStatus.slice(0,doc.properties.FacilityStatus.indexOf(":"));
 		out = {opacity:0.9};
-        switch (status) {
-            case 'Existing':
-            	//
-            	break;
-            case 'Under construction':
-            	out.dashArray = "4, 10";
+		switch (status) {
+			case 'Existing':
+				//
+				break;
+			case 'Under construction':
+				out.dashArray = "4, 10";
 
-            	break;
-            case 'In design':
-            	out.dashArray = "4,15";
+				break;
+			case 'In design':
+				out.dashArray = "4,15";
 
-            	break;
-            case 'Planned':
-            	out.dashArray = "3, 20"
-            	break;
-        }
-        var facT = doc.properties.FacilityType
+				break;
+			case 'Planned':
+				out.dashArray = "3, 20"
+				break;
+		}
+		var facT = doc.properties.FacilityType
 		var pn = facT.indexOf("(")
 		if( pn>0 ){
 				facT = facT.slice(0,pn)
@@ -116,8 +116,8 @@ function style(doc) {
 				out.color ="#999999";
 				break;
 		}
-        return out;
-    }
+		return out;
+	}
 var dropdowns = {"status":[{"value":"Existing: Facility is open for use","display":"Existing"},{"value":"In design: Currently in design review by MassDOT or under design locally","display":"In design"},{"value":"Under construction: Facility is actively being built, under contract for construction or advertised for construction","display":"Under construction"},{"value":"Planned: Programmed in STIP, feasability being studied or local design funds encumbered/earmarked","display":"Planned"}],"type":[{"value":"Shared use path","display":"Shared use path"},{"value":"Bike lane","display":"Bike lane"},{"value":"Sign-posted on-road bike route (with no other accommodation on the road surface)","display":"Sign-posted on-road bike route"},{"value":"Paved bike shoulder (4-5 foot min./moderate volume/speed road, locally identified as a bike facility)","display":"Paved bike shoulder"},{"value":"Bicycle/Pedestrian priority roadway","display":"Bicycle/Pedestrian priority roadway"},{"value":"On-Road - To Be Determined","display":"On-Road - To Be Determined"},{"value":"Hybrid (road segment with different treatments in each direction of travel)","display":"Hybrid"},{"value":"Marked shared lane","display":"Marked shared lane"},{"value":"Cycle track","display":"Cycle track"}]};
 var statusTemplate=Mustache.compile('<option>All Statuses</option>\
 {{#status}}\
@@ -169,19 +169,27 @@ $("select").change(function(){
 
 m.addHash({lc:lc});
  $(function(){
-            var mapmargin = parseInt($("#map").css("margin-top"), 10);
-      $('#map').css("height", ($(window).height() - mapmargin));
-      $(window).on("resize", function(e){
-        $('#map').css("height", ($(window).height() - mapmargin));
-           if($(window).width()>=980){
-      	$('#map').css("margin-top",40);
-      }else{
-      		$('#map').css("margin-top",-20);
-      }
-      });
-      if($(window).width()>=980){
-      	$('#map').css("margin-top",40);
-      }else{
-      		$('#map').css("margin-top",-20);
-      }
-            });
+			var mapmargin = parseInt($("#map").css("margin-top"), 10);
+	  $('#map').css("height", ($(window).height() - mapmargin));
+	  $(window).on("resize", function(e){
+		$('#map').css("height", ($(window).height() - mapmargin));
+		   if($(window).width()>=980){
+		$('#map').css("margin-top",40);
+	}else{
+			$('#map').css("margin-top",-20);
+	}
+	});
+	if($(window).width()>=980){
+		$('#map').css("margin-top",40);
+	}else{
+			$('#map').css("margin-top",-20);
+	}
+			});
+
+function getRes(){
+	var b = m.getBounds();
+	var p = m.getPixelBounds();
+	var xSize= ((b.getNorthEast().lng-b.getSouthWest().lng)/p.getSize().x);
+	var ySize = ((b.getNorthEast().lat-b.getSouthWest().lat)/p.getSize().y);
+	return (xSize>ySize)?xSize:ySize;
+}
