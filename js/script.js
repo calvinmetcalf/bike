@@ -38,7 +38,11 @@ var baseMaps = [
     "Stamen.TerrainBackground",
     "Stamen.Watercolor",
 ];
-var bikes = L.geoJson.ajax(L.Browser.vml?"json/bikes-xrm.json":"json/bikes.json",{style:style,onEachFeature:onEachFeature}).addTo(m);
+function getURL(){
+	//L.Browser.vml?"json/bikes-xrm.json":"json/bikes.json"
+	return "https://gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString();
+}
+var bikes = L.geoJson.ajax(getURL(),{style:style,onEachFeature:onEachFeature,dataType:"jsonp"}).addTo(m);
 
 var lc = L.control.layers.filled(baseMaps,{"bikes":bikes},{map:m});
 var popupTemplate=Mustache.compile('<ul>{{#items}}<li><strong>{{key}}</strong>: {{value}}</li>{{/items}}</ul>');
@@ -56,6 +60,9 @@ function onEachFeature(ft,layer) {
         layer.bindPopup(popupTemplate(out));
     }
 }
+m.on("moveend",function(){
+	bikes.refresh(getURL());
+});
 function style(doc) {
 		var status = doc.properties.FacilityStatus.slice(0,doc.properties.FacilityStatus.indexOf(":"));
 		out = {opacity:0.9};
