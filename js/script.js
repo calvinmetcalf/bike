@@ -192,5 +192,5 @@ function getRes(){
 	var p = m.getPixelBounds();
 	var xSize= ((b.getNorthEast().lng-b.getSouthWest().lng)/p.getSize().x);
 	var ySize = ((b.getNorthEast().lat-b.getSouthWest().lat)/p.getSize().y);
-	return ((xSize>ySize)?xSize:ySize)*20;
+	return ((xSize>ySize)?xSize:ySize)*100;
 }
