@@ -39,8 +39,7 @@ var baseMaps = [
 	"Stamen.Watercolor",
 ];
 function getURL(){
-	//L.Browser.vml?"json/bikes-xrm.json":"json/bikes.json"
-	return "https://gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString()+"&simplify="+getRes();
+	return L.Browser.vml?("//gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString()+"&simplify="+getRes()):"//gis-otp.rhcloud.com/bikes" 
 }
 var bikes = L.geoJson.ajax(getURL(),{style:style,onEachFeature:onEachFeature,dataType:"jsonp"}).addTo(m);
 
@@ -57,12 +56,14 @@ function onEachFeature(ft,layer) {
 		}
 			}
 		}
-		layer.bindPopup(popupTemplate(out));
+		layer.bindPopup(popupTemplate(out),{autoPan:false,maxHeight:200});
 	}
 }
+if(L.Browser.vml){
 m.on("moveend",function(){
 	bikes.refresh(getURL());
 });
+}
 function style(doc) {
 		var status = doc.properties.FacilityStatus.slice(0,doc.properties.FacilityStatus.indexOf(":"));
 		out = {opacity:0.9};
@@ -191,6 +192,5 @@ function getRes(){
 	var p = m.getPixelBounds();
 	var xSize= ((b.getNorthEast().lng-b.getSouthWest().lng)/p.getSize().x);
 	var ySize = ((b.getNorthEast().lat-b.getSouthWest().lat)/p.getSize().y);
-	var out = ((xSize>ySize)?xSize:ySize);
-	return L.Browser.vml?out*10:out;
+	return ((xSize>ySize)?xSize:ySize)*20;
 }
