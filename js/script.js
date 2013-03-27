@@ -39,9 +39,9 @@ var baseMaps = [
 	"Stamen.Watercolor",
 ];
 function getURL(){
-	return L.Browser.vml?("//gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString()+"&simplify="+getRes()):"//gis-otp.rhcloud.com/bikes" 
+	return L.Browser.vml?("//gis-otp.rhcloud.com/bikes?bbox="+m.getBounds().toBBoxString()+"&simplify="+getRes()):"json/bikes.json" ;
 }
-var bikes = L.geoJson.ajax(getURL(),{style:style,onEachFeature:onEachFeature,dataType:"jsonp"}).addTo(m);
+var bikes = L.geoJson.ajax(getURL(),{style:style,onEachFeature:onEachFeature,dataType:L.Browser.vml?"jsonp":"json"}).addTo(m);
 
 var lc = L.control.layers.filled(baseMaps,{"bikes":bikes},{map:m});
 var popupTemplate=Mustache.compile('<ul>{{#items}}<li><strong>{{key}}</strong>: {{value}}</li>{{/items}}</ul>');
