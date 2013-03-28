@@ -8704,13 +8704,13 @@ L.Control.Layers.Provided = L.Control.Layers.extend({
 								var out = {},
 								len = base.length,
 								i=0;
-								while(i<len){
+								while(i<len){if(base[i].replace){
 										if (i === 0) {
 												first = L.tileLayer.provider(base[0]);
 												out[base[i].replace(/\./g,": ").replace(/([a-z])([A-Z])/g,"$1 $2")] = first;
 										} else {
 												out[base[i].replace(/\./g,": ").replace(/([a-z])([A-Z])/g,"$1 $2")] = L.tileLayer.provider(base[i]);
-										}
+										}}
 										i++;
 								}
 								base = out;
