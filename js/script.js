@@ -46,16 +46,16 @@ var utfGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.grid.json?ca
 m.addLayer(utfGrid);
 var popup = L.popup();
 var template = Mustache.compile("<ul>\
-{{#FacilityType}}<li>Type : {{{FacilityType}}}</li>{{/FacilityType}}\
-{{#FacilityDetail}}<li>Type details : {{{FacilityDetail}}}</li>{{/FacilityDetail}}\
-{{#AltFacilityType}}<li>Alternate Facility Type: {{{AltFacilityType}}}</li>{{/AltFacilityType}}\
-{{#FacilityStatus}}<li>Status : {{{FacilityStatus}}}</li>{{/FacilityStatus}}\
-{{#BSGkind}}<li>Bay State Greenway : {{{BSGkind}}}</li>{{/BSGkind}}\
-{{#CurrentOwner}}<li>Owner : {{{CurrentOwner}}}</li>{{/CurrentOwner}}\
-{{#Steward}}<li>Steward : {{{Steward}}}</li>{{/Steward}}\
-{{#LocalName}}<li>Local Name : {{{LocalName}}}</li>{{/LocalName}}\
-{{#RegionalName}}<li>Regional Name : {{{RegionalName}}}</li>{{/RegionalName}}\
-{{#AlternateTrailName}}<li>Alternate Trail Name : {{{AlternateTrailName}}}</li>{{/AlternateTrailName}}\
+{{#facilitytype}}<li>Type : {{{facilitytype}}}</li>{{/facilitytype}}
+{{#facilitydetail}}<li>Type details : {{{facilitydetail}}}</li>{{/facilitydetail}}\
+{{#altfacilitytype}}<li>Alternate Facility Type: {{{altfacilitytype}}}</li>{{/altfacilitytype}}\
+{{#facilitystatus}}<li>Status : {{{facilitystatus}}}</li>{{/facilitystatus}}\
+{{#bsgkind}}<li>Bay State Greenway : {{{bsgkind}}}</li>{{/bsgkind}}\
+{{#currentowner}}<li>Owner : {{{currentowner}}}</li>{{/currentowner}}\
+{{#steward}}<li>Steward : {{{steward}}}</li>{{/steward}}\
+{{#localname}}<li>Local Name : {{{localname}}}</li>{{/localname}}\
+{{#regionalname}}<li>Regional Name : {{{regionalname}}}</li>{{/regionalname}}\
+{{#alternatetrailname}}<li>Alternate Trail Name : {{{alternatetrailname}}}</li>{{/alternatetrailname}}\
 </ul>")
 utfGrid.on('click', function (e) {
     //click events are fired with e.data==null if an area with no hit is clicked
