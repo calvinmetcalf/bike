@@ -46,7 +46,7 @@ var utfGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.grid.json?ca
 m.addLayer(utfGrid);
 var popup = L.popup();
 var template = Mustache.compile("<ul>\
-{{#facilitytype}}<li>Type : {{{facilitytype}}}</li>{{/facilitytype}}
+{{#facilitytype}}<li>Type : {{{facilitytype}}}</li>{{/facilitytype}}\
 {{#facilitydetail}}<li>Type details : {{{facilitydetail}}}</li>{{/facilitydetail}}\
 {{#altfacilitytype}}<li>Alternate Facility Type: {{{altfacilitytype}}}</li>{{/altfacilitytype}}\
 {{#facilitystatus}}<li>Status : {{{facilitystatus}}}</li>{{/facilitystatus}}\
