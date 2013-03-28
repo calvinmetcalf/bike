@@ -8704,7 +8704,7 @@ L.Control.Layers.Provided = L.Control.Layers.extend({
 								var out = {},
 								len = base.length,
 								i=0;
-								while(i<len){if(typeof base[i]===){
+								while(i<len){if(typeof base[i]==="string"){
 										if (i === 0) {
 												first = L.tileLayer.provider(base[0]);
 												out[base[i].replace(/\./g,": ").replace(/([a-z])([A-Z])/g,"$1 $2")] = first;
