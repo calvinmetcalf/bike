@@ -38,8 +38,8 @@ var baseMaps = [
 	"Stamen.TerrainBackground",
 	"Stamen.Watercolor",
 ];
-var bikes = L.tileLayer("http://tiles{s}.ro.lt/bikes/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]}).addTo(m)
-var utfGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bikes/{z}/{x}/{y}.grid.json?callback={cb}', {
+var bikes = L.tileLayer("http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]}).addTo(m)
+var utfGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.grid.json?callback={cb}', {
     resolution: 4,
 	subdomains:[1,2,3,4]
 });
