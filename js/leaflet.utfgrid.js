@@ -131,10 +131,9 @@ L.UtfGrid = L.Class.extend({
 		y = (y + max) % max;
 
 		var data = this._cache[map.getZoom() + '_' + x + '_' + y];
-		if (!data) {
+		if (!data || !data.grid) {
 			return { latlng: e.latlng, data: null };
 		}
-
 		var idx = this._utfDecode(data.grid[gridY].charCodeAt(gridX)),
 		    key = data.keys[idx],
 		    result = data.data[key];
