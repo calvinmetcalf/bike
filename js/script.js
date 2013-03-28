@@ -35,7 +35,6 @@ var baseMaps = [
 	"OpenStreetMap.Mapnik",
 	"OpenStreetMap.DE",
 	"Esri.WorldImagery",
-	"Stamen.TerrainBackground",
 	"Stamen.Watercolor",
 ];
 var bikes = L.tileLayer("http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]}).addTo(m)
@@ -60,11 +59,10 @@ var template = Mustache.compile("<ul>\
 utfGrid.on('click', function (e) {
     //click events are fired with e.data==null if an area with no hit is clicked
     if (e.data) {
-		console.log(e.data);
         popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
     }
 });
-var lc = L.control.layers.filled(baseMaps,{"bikes":bikes},{map:m});
+var lc = L.control.layers.provided(baseMaps,{"bikes":bikes}).addTo(m);
 	m.addHash({lc:lc});
 	 $(function(){
 				var mapmargin = parseInt($("#map").css("margin-top"), 10);
