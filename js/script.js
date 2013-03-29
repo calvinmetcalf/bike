@@ -29,7 +29,7 @@ L.Control.Layers.prototype._addItem= function (obj) {
 	}
 
 //var b = [];
-var m = L.map('map').setView([42.1695,-71.1530],9);
+var m = L.map('map',{maxZoom:16}).setView([42.1695,-71.1530],9);
 var baseMaps = [
 	"MapQuestOpen.OSM",
 	"OpenStreetMap.Mapnik",
