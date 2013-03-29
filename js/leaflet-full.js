@@ -8704,13 +8704,13 @@ L.Control.Layers.Provided = L.Control.Layers.extend({
 								var out = {},
 								len = base.length,
 								i=0;
-								while(i<len){if(typeof base[i]==="string"){
+								while(i<len){
 										if (i === 0) {
 												first = L.tileLayer.provider(base[0]);
 												out[base[i].replace(/\./g,": ").replace(/([a-z])([A-Z])/g,"$1 $2")] = first;
 										} else {
 												out[base[i].replace(/\./g,": ").replace(/([a-z])([A-Z])/g,"$1 $2")] = L.tileLayer.provider(base[i]);
-										}}
+										}
 										i++;
 								}
 								base = out;
@@ -8754,11 +8754,11 @@ L.control.layers.provided = function (baseLayers, overlays, options) {
       }
       if (this.options.lc && !this.options.formatBase) {
         this.options.formatBase = [
-          /[(?:\s|\:)A-Z]/g, function(match) {
+          /[\s\:A-Z]/g, function(match) {
             if (match.match(/\s/)) {
-              return "_ ";
+              return "_";
             } else if (match.match(/\:/)) {
-            	return ""
+                return "";
             }
             if (match.match(/[A-Z]/)) {
               return match.toLowerCase();
@@ -8766,17 +8766,19 @@ L.control.layers.provided = function (baseLayers, overlays, options) {
           }
         ];
       }
-      if (this.map._loaded) {
+      if (this.map._loaded || location.hash) {
         return this.startListning();
       } else {
-        return this.map.on("load", this.startListning);
+        return this.map.on("load", this.startListning,this);
       }
     },
     startListning: function() {
-      var onHashChange,
-        _this = this;
+      var onHashChange,phash;
       if (location.hash) {
-        this.updateFromState(this.parseHash(location.hash));
+        phash = this.parseHash(location.hash);
+        if(phash){
+        this.updateFromState(phash);
+        }
       }
       if (history.pushState) {
         if (!location.hash) {
@@ -8784,32 +8786,32 @@ L.control.layers.provided = function (baseLayers, overlays, options) {
         }
         window.onpopstate = function(event) {
           if (event.state) {
-            return _this.updateFromState(event.state);
+            return this.updateFromState(event.state);
           }
         };
         this.map.on("moveend", function() {
           var pstate;
-          pstate = _this.formatState();
-          if (location.hash !== pstate[2] && !_this.moving) {
+          pstate = this.formatState();
+          if (location.hash !== pstate[2] && !this.moving) {
             return history.pushState.apply(history, pstate);
           }
-        });
+        },this);
       } else {
         if (!location.hash) {
           location.hash = this.formatState()[2];
         }
         onHashChange = function() {
           var pstate;
-          pstate = _this.formatState();
-          if (location.hash !== pstate[2] && !_this.moving) {
+          pstate = this.formatState();
+          if (location.hash !== pstate[2] && !this.moving) {
             return location.hash = pstate[2];
           }
         };
-        this.map.on("moveend", onHashChange);
+        this.map.on("moveend", onHashChange, this);
         if (('onhashchange' in window) && (window.documentMode === void 0 || window.documentMode > 7)) {
           window.onhashchange = function() {
             if (location.hash) {
-              return _this.updateFromState(_this.parseHash(location.hash));
+              return this.updateFromState(this.parseHash(location.hash));
             }
           };
         } else {
@@ -8818,18 +8820,18 @@ L.control.layers.provided = function (baseLayers, overlays, options) {
       }
       return this.map.on("baselayerchange", function(e) {
         var pstate, _ref;
-        _this.base = (_ref = _this.options.lc._layers[e.layer._leaflet_id].name).replace.apply(_ref, _this.options.formatBase);
-        pstate = _this.formatState();
+        this.base = (_ref = this.options.lc._layers[e.layer._leaflet_id].name).replace.apply(_ref, _this.options.formatBase);
+        pstate = this.formatState();
         if (history.pushState) {
-          if (location.hash !== pstate[2] && !_this.moving) {
+          if (location.hash !== pstate[2] && !this.moving) {
             return history.pushState.apply(history, pstate);
           }
         } else {
-          if (location.hash !== pstate[2] && !_this.moving) {
+          if (location.hash !== pstate[2] && !this.moving) {
             return location.hash = pstate[2];
           }
         }
-      });
+      }, this);
     },
     parseHash: function(hash) {
       var args, lat, latIndex, lngIndex, lon, out, path, zIndex, zoom;
@@ -8837,6 +8839,9 @@ L.control.layers.provided = function (baseLayers, overlays, options) {
       zIndex = path.indexOf("{z}");
       latIndex = path.indexOf("{lat}");
       lngIndex = path.indexOf("{lng}");
+      if(zIndex === -1 || latIndex === -1 || lngIndex === -1){
+          return;
+      }
       if (hash.indexOf("#") === 0) {
         hash = hash.substr(1);
       }
