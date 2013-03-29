@@ -37,12 +37,18 @@ var baseMaps = [
 	"Esri.WorldImagery",
 	"Stamen.Watercolor",
 ];
-var bikes = L.tileLayer("http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]}).addTo(m)
-var utfGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.grid.json?callback={cb}', {
+var bike = L.tileLayer("http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]});
+var bikeGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.grid.json?callback={cb}', {
     resolution: 4,
 	subdomains:[1,2,3,4]
 });
-m.addLayer(utfGrid);
+var bikes = L.layerGroup([bike,bikeGrid]).addTo(m);
+var envShape = L.tileLayer("http://tiles{s}.ro.lt/envbike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]});
+var envGrid = new L.UtfGrid('http://tiles{s}.ro.lt/envbike/{z}/{x}/{y}.grid.json?callback={cb}', {
+    resolution: 4,
+	subdomains:[1,2,3,4]
+});
+var env = L.layerGroup([envShape,envGrid]).addTo(m);
 var popup = L.popup();
 var template = Mustache.compile("<ul>\
 {{#facilitytype}}<li>Type : {{{facilitytype}}}</li>{{/facilitytype}}\
@@ -56,13 +62,15 @@ var template = Mustache.compile("<ul>\
 {{#regionalname}}<li>Regional Name : {{{regionalname}}}</li>{{/regionalname}}\
 {{#alternatetrailname}}<li>Alternate Trail Name : {{{alternatetrailname}}}</li>{{/alternatetrailname}}\
 </ul>")
-utfGrid.on('click', function (e) {
+bikeGrid.on('click', makePopup);
+function makePopup (e) {
     //click events are fired with e.data==null if an area with no hit is clicked
     if (e.data) {
         popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
     }
-});
-var lc = L.control.layers.provided(baseMaps,{"bikes":bikes}).addTo(m);
+}
+envGrid.on('click', makePopup);
+var lc = L.control.layers.provided(baseMaps,{"bikes":bikes,"Envisioned Bikes":env}).addTo(m);
 	m.addHash({lc:lc});
 	 $(function(){
 				var mapmargin = parseInt($("#map").css("margin-top"), 10);
