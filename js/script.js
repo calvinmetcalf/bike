@@ -135,7 +135,16 @@ var SearchForm = Backbone.View.extend({
 			_this.data.searches ++;
 			var ll = [data[0].lat,data[0].lon];
 			var layer = L.marker(ll).addTo(m);
-			layer.bindPopup(data[0].display_name.split(", ").join("<br />"));
+			var parseName = function(data){
+				var out = {items:[]};
+				var k;
+				for(var key in data){
+					k = key.replace(/_/," ").replace(/\s\w/g,function(a){return a.toUpperCase()});
+					out.items.push({key:k.slice(0,1).toUpperCase()+k.slice(1),value:data[key]});
+				}
+				return Mustache.render('<dl class="dl-horizontal">{{#items}} <dt>{{key}}</dt><dd>{{value}}</dd>{{/items}}</dl>',out);
+			};
+			layer.bindPopup(parseName(data[0].address));
 			lc.addOverlay(layer,"Search Results " + _this.data.searches);
 			m.setView(ll,16);
 			}else{
