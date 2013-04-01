@@ -48,7 +48,7 @@ var envGrid = new L.UtfGrid('http://tiles{s}.ro.lt/envbike/{z}/{x}/{y}.grid.json
     resolution: 4,
 	subdomains:[1,2,3,4]
 });
-var env = L.layerGroup([envShape,envGrid]).addTo(m);
+var env = L.layerGroup([envShape,envGrid]);
 var popup = L.popup();
 var template = Mustache.compile("<ul>\
 {{#facilitytype}}<li>Type : {{{facilitytype}}}</li>{{/facilitytype}}\
@@ -64,29 +64,51 @@ var template = Mustache.compile("<ul>\
 </ul>")
 bikeGrid.on('click', makePopup);
 function makePopup (e) {
-    //click events are fired with e.data==null if an area with no hit is clicked
     if (e.data) {
         popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
     }
 }
 envGrid.on('click', makePopup);
 var lc = L.control.layers.provided(baseMaps,{"bikes":bikes,"Envisioned Bikes":env}).addTo(m);
-	m.addHash({lc:lc});
-	 $(function(){
-				var mapmargin = parseInt($("#map").css("margin-top"), 10);
-		  $('#map').css("height", ($(window).height() - mapmargin));
-		  $(window).on("resize", function(e){
-			$('#map').css("height", ($(window).height() - mapmargin));
-			   if($(window).width()>=980){
-			$('#map').css("margin-top",40);
-		}else{
-				$('#map').css("margin-top",-20);
-		}
-		});
+m.addHash({lc:lc});
+$(function(){
+	var mapmargin = parseInt($("#map").css("margin-top"), 10);
+	$('#map').css("height", ($(window).height() - mapmargin));
+	$(window).on("resize", function(){
+		$('#map').css("height", ($(window).height() - mapmargin));	
 		if($(window).width()>=980){
 			$('#map').css("margin-top",40);
 		}else{
-				$('#map').css("margin-top",-20);
+			$('#map').css("margin-top",-20);
 		}
-				});
-
+	});
+	if($(window).width()>=980){
+		$('#map').css("margin-top",40);
+	}else{
+		$('#map').css("margin-top",-20);
+	}
+});
+var searches = 0;
+$("#searchForm").on("submit",function(e){
+	e.preventDefault();
+	var val = $("#searchData").val();
+	$.ajax({
+		url: "http://nominatim.openstreetmap.org/search",
+		data:{
+			q:val,
+			format:"json",
+			addressdetails: true,
+			limit:1
+		},
+		dataType:"jsonp",
+		jsonp:"json_callback"
+	}).then(function(data){
+		searches ++;
+		var ll = [data[0].lat,data[0].lon];
+		var layer = L.marker(ll).addTo(m);
+		layer.bindPopup(data[0].display_name.split(", ").join("<br />"));
+		lc.addOverlay(layer,"Search Results " + searches);
+		m.setView(ll,16);
+	});
+	return true;
+});
