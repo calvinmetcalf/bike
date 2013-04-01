@@ -88,27 +88,72 @@ $(function(){
 		$('#map').css("margin-top",-20);
 	}
 });
-var searches = 0;
-$("#searchForm").on("submit",function(e){
-	e.preventDefault();
-	var val = $("#searchData").val();
-	$.ajax({
-		url: "http://nominatim.openstreetmap.org/search",
-		data:{
-			q:val,
-			format:"json",
-			addressdetails: true,
-			limit:1
-		},
-		dataType:"jsonp",
-		jsonp:"json_callback"
-	}).then(function(data){
-		searches ++;
-		var ll = [data[0].lat,data[0].lon];
-		var layer = L.marker(ll).addTo(m);
-		layer.bindPopup(data[0].display_name.split(", ").join("<br />"));
-		lc.addOverlay(layer,"Search Results " + searches);
-		m.setView(ll,16);
+var SearchForm = Backbone.View.extend({
+	initialize:function(){
+		this.render();
+	},
+	el:$("#searchForm"),
+	template:Mustache.compile('\
+	{{#error}}<div class="control-group error">{{/error}}\
+		<div class="input-append">\
+			<input type="text" class="span3 search-query" placeholder="Enter Address" id="searchData"{{#value}} value="{{value}}"{{/value}} />\
+			<button type="submit" class="btn" id="searchButton">\
+				<i id="searchIcon" class="{{#icon}}icon-{{.}} {{/icon}}"></i>\
+			</button>\
+			</div>\
+			{{#error}}<span class="help-inline">{{error}}</span></div>{{/error}}\
+	'),
+	data:{
+	value:false,
+	icon:["search"],
+	searches:0,
+	error:false
+	},
+	events:{
+		"submit":"searchStart",
+		"focus input":"errorReset"
+	},
+	searchStart:function(e){
+		e.preventDefault();
+		var val = this.$el.children().children("input").val();
+		this.data.icon=["spinner","spin"];
+		this.data.value=val;
+		this.render();
+		var _this=this;
+		$.ajax({
+			url: "http://nominatim.openstreetmap.org/search",
+			data:{
+				q:val,
+				format:"json",
+				addressdetails: true,
+				limit:1
+			},
+			dataType:"jsonp",
+			jsonp:"json_callback"
+		}).then(function(data){
+			if(data.length){
+			_this.data.searches ++;
+			var ll = [data[0].lat,data[0].lon];
+			var layer = L.marker(ll).addTo(m);
+			layer.bindPopup(data[0].display_name.split(", ").join("<br />"));
+			lc.addOverlay(layer,"Search Results " + _this.data.searches);
+			m.setView(ll,16);
+			}else{
+				_this.data.error="No Address Found";
+			}
+			_this.data.icon=["search"];
+			_this.render();
+		});
+		return true;
+	},
+	errorReset:function(){
+		if(this.data.error){
+			this.data.error=false;
+			this.render();
+		}
+	},
+	render:function(){
+		this.$el.html(this.template(this.data));
+	}
 	});
-	return true;
-});
+var searchForm = new SearchForm();
