@@ -24448,6 +24448,8 @@ var template = Mustache.compile("<ul>\
 bikeGrid.on('click', makePopup);
 function makePopup (e) {
     if (e.data) {
+    	e.data.facilitystatus=cleanStatus(e.data.facilitystatus).replace(/(\b)[a-z]/g,function(a){console.log(a);return a.toUpperCase();});
+    	e.data.facilitytype=cleanType(e.data.facilitytype).replace(/(\b)[a-z]/g,function(a){console.log(a);return a.toUpperCase();});
         popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
     }
 }
@@ -24533,7 +24535,20 @@ var SearchForm = Backbone.View.extend({
 	}
 	});
 var searchForm = new SearchForm();
-
+function cleanStatus(status){
+	var p = status.indexOf(":");
+	if(p>-1){
+		status = status.slice(0,p);
+	}
+	return status;
+}
+function cleanType(type){
+	var p = type.indexOf("(");
+	if(p>-1){
+		type = type.slice(0,p);
+	}
+	return type;
+}
 	var mapmargin = parseInt($("#map").css("margin-top"), 10);
 	$('#map').css("height", ($(window).height() - mapmargin));
 	$(window).on("resize", function(){
