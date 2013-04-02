@@ -1,3 +1,4 @@
+$(function(){
 L.Control.Layers.prototype._addItem= function (obj) {
 		var label = document.createElement('label'),
 			input,
@@ -71,23 +72,7 @@ function makePopup (e) {
 envGrid.on('click', makePopup);
 var lc = L.control.layers.provided(baseMaps,{"bikes":bikes,"Envisioned Bikes":env}).addTo(m);
 m.addHash({lc:lc});
-$(function(){
-	var mapmargin = parseInt($("#map").css("margin-top"), 10);
-	$('#map').css("height", ($(window).height() - mapmargin));
-	$(window).on("resize", function(){
-		$('#map').css("height", ($(window).height() - mapmargin));	
-		if($(window).width()>=980){
-			$('#map').css("margin-top",40);
-		}else{
-			$('#map').css("margin-top",-20);
-		}
-	});
-	if($(window).width()>=980){
-		$('#map').css("margin-top",40);
-	}else{
-		$('#map').css("margin-top",-20);
-	}
-});
+m.attributionControl.setPrefix('Powered by <a href="http://leafletjs.com">Leaflet</a> — Search by <a href="http://nominatim.openstreetmap.org/">Nominatim</a>');
 var SearchForm = Backbone.View.extend({
 	initialize:function(){
 		this.render();
@@ -166,3 +151,20 @@ var SearchForm = Backbone.View.extend({
 	}
 	});
 var searchForm = new SearchForm();
+
+	var mapmargin = parseInt($("#map").css("margin-top"), 10);
+	$('#map').css("height", ($(window).height() - mapmargin));
+	$(window).on("resize", function(){
+		$('#map').css("height", ($(window).height() - mapmargin));	
+		if($(window).width()>=980){
+			$('#map').css("margin-top",40);
+		}else{
+			$('#map').css("margin-top",-20);
+		}
+	});
+	if($(window).width()>=980){
+		$('#map').css("margin-top",40);
+	}else{
+		$('#map').css("margin-top",-20);
+	}
+});
