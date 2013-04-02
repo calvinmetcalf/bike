@@ -40,13 +40,13 @@ var baseMaps = [
 ];
 var bike = L.tileLayer("http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]});
 var bikeGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bike/{z}/{x}/{y}.grid.json?callback={cb}', {
-    resolution: 4,
+	resolution: 4,
 	subdomains:[1,2,3,4]
 });
 var bikes = L.layerGroup([bike,bikeGrid]).addTo(m);
 var envShape = L.tileLayer("http://tiles{s}.ro.lt/envbike/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]});
 var envGrid = new L.UtfGrid('http://tiles{s}.ro.lt/envbike/{z}/{x}/{y}.grid.json?callback={cb}', {
-    resolution: 4,
+	resolution: 4,
 	subdomains:[1,2,3,4]
 });
 var env = L.layerGroup([envShape,envGrid]);
@@ -65,9 +65,14 @@ var template = Mustache.compile("<ul>\
 </ul>")
 bikeGrid.on('click', makePopup);
 function makePopup (e) {
-    if (e.data) {
-        popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
-    }
+	if (e.data) {
+		e.data.facilitystatus=cleanStatus(e.data.facilitystatus).replace(/(\b)[a-z]/g,function(a){console.log(a);return a.toUpperCase();});
+		e.data.facilitytype=cleanType(e.data.facilitytype).replace(/(\b)[a-z]/g,function(a){console.log(a);return a.toUpperCase();});
+		if(e.data.regionalname){
+			e.data.regionalname=e.data.regionalname.split("+").filter(function(a){return a!==""}).join(", ")
+		}
+		popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
+	}
 }
 envGrid.on('click', makePopup);
 var lc = L.control.layers.provided(baseMaps,{"bikes":bikes,"Envisioned Bikes":env}).addTo(m);
@@ -151,7 +156,20 @@ var SearchForm = Backbone.View.extend({
 	}
 	});
 var searchForm = new SearchForm();
-
+function cleanStatus(status){
+	var p = status.indexOf(":");
+	if(p>-1){
+		status = status.slice(0,p);
+	}
+	return status;
+}
+function cleanType(type){
+	var p = type.indexOf("(");
+	if(p>-1){
+		type = type.slice(0,p);
+	}
+	return type;
+}
 	var mapmargin = parseInt($("#map").css("margin-top"), 10);
 	$('#map').css("height", ($(window).height() - mapmargin));
 	$(window).on("resize", function(){
