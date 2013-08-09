@@ -50,32 +50,40 @@ var envGrid = new L.UtfGrid('http://tiles{s}.ro.lt/envbike/{z}/{x}/{y}.grid.json
 	subdomains:[1,2,3,4]
 });
 var env = L.layerGroup([envShape,envGrid]);
+var bsgShape = L.tileLayer("http://tiles{s}.ro.lt/bsg/{z}/{x}/{y}.png",{subdomains:[1,2,3,4]});
+var bsgGrid = new L.UtfGrid('http://tiles{s}.ro.lt/bsg/{z}/{x}/{y}.grid.json?callback={cb}', {
+	resolution: 4,
+	subdomains:[1,2,3,4]
+});
+var bsg = L.layerGroup([bsgShape,bsgGrid]);
 var popup = L.popup();
 var template = Mustache.compile("<ul>\
-{{#facilitytype}}<li>Type : {{{facilitytype}}}</li>{{/facilitytype}}\
-{{#facilitydetail}}<li>Type details : {{{facilitydetail}}}</li>{{/facilitydetail}}\
-{{#altfacilitytype}}<li>Alternate Facility Type: {{{altfacilitytype}}}</li>{{/altfacilitytype}}\
-{{#facilitystatus}}<li>Status : {{{facilitystatus}}}</li>{{/facilitystatus}}\
-{{#bsgkind}}<li>Bay State Greenway : {{{bsgkind}}}</li>{{/bsgkind}}\
-{{#currentowner}}<li>Owner : {{{currentowner}}}</li>{{/currentowner}}\
-{{#steward}}<li>Steward : {{{steward}}}</li>{{/steward}}\
-{{#localname}}<li>Local Name : {{{localname}}}</li>{{/localname}}\
-{{#regionalname}}<li>Regional Name : {{{regionalname}}}</li>{{/regionalname}}\
-{{#alternatetrailname}}<li>Alternate Trail Name : {{{alternatetrailname}}}</li>{{/alternatetrailname}}\
+{{#FacilityType}}<li>Type : {{{showType}}}</li>{{/FacilityType}}\
+{{#FacilityDetail}}<li>Type details : {{{FacilityDetail}}}</li>{{/FacilityDetail}}\
+{{#AltFacilityType}}<li>Alternate Facility Type: {{{AltFacilityType}}}</li>{{/AltFacilityType}}\
+{{#FacilityStatus}}<li>Status : {{{showStatus}}}</li>{{/FacilityStatus}}\
+{{#showBsg}}<li>Bay State Greenway : {{{BSG}}}</li>{{/showBsg}}\
+{{#Steward}}<li>Steward : {{{Steward}}}</li>{{/Steward}}\
+{{#LocalName}}<li>Local Name : {{{LocalName}}}</li>{{/LocalName}}\
+{{#showReg}}<li>Regional Name : {{{showReg}}}</li>{{/showReg}}\
 </ul>")
 bikeGrid.on('click', makePopup);
 function makePopup (e) {
 	if (e.data) {
-		e.data.facilitystatus=cleanStatus(e.data.facilitystatus).replace(/(\b)[a-z]/g,function(a){console.log(a);return a.toUpperCase();});
-		e.data.facilitytype=cleanType(e.data.facilitytype).replace(/(\b)[a-z]/g,function(a){console.log(a);return a.toUpperCase();});
-		if(e.data.regionalname){
-			e.data.regionalname=e.data.regionalname.split("+").filter(function(a){return a!==""}).join(", ")
+		e.data.showStatus=function(){return cleanStatus(this.FacilityStatus).replace(/(\b)[a-z]/g,function(a){return a.toUpperCase();})};
+		e.data.showType=function(){return cleanType(this.FacilityType).replace(/(\b)[a-z]/g,function(a){return a.toUpperCase();});}
+		e.data.showBsg = function(){
+			return !(this.BSG === "" || this.BSG === "Not in Bay State Greenway network" || this.bsg === "Secondary")
+		}
+		if(this.RegionalName){
+			e.data.showReg=function(){return this.RegionalName.split("+").filter(function(a){return !(a==="" || a.match(/BSG\_/))}).join(", ")}
 		}
 		popup.setContent(template(e.data)).setLatLng(e.latlng).openOn(m);
 	}
 }
 envGrid.on('click', makePopup);
-var lc = L.control.layers.provided(baseMaps,{"bikes":bikes,"Envisioned Bikes":env}).addTo(m);
+bsgGrid.on('click', makePopup);
+var lc = L.control.layers.provided(baseMaps,{"bikes":bikes,"Envisioned Bikes":env,"BSG":bsg},{collapsed:L.Browser.mobile}).addTo(m);
 m.addHash({lc:lc});
 m.attributionControl.setPrefix('Powered by <a href="http://leafletjs.com">Leaflet</a> — Search by <a href="http://nominatim.openstreetmap.org/">Nominatim</a>');
 var SearchForm = Backbone.View.extend({
@@ -170,19 +178,57 @@ function cleanType(type){
 	}
 	return type;
 }
+var Legend = L.Control.extend({
+    options: {
+        position: 'bottomleft'
+    },
+
+    onAdd: function () {
+        // create the control container with a particular class name
+        var container = L.DomUtil.create('div', true/*L.Browser.mobile*/?'legend container-fluid':'legend container-fluid leaflet-popup-content-wrapper');
+        var data = {items:[
+        	{name:"Cycle Track",color:"rgb(115,0,0)",icon:"road"},
+        	{name:"Marked Shared Lane",color:"rgb(115,178,255)",icon:"road"},
+        	{name:"Bike Lane",color:"rgb(0,112,255)",icon:"road"},
+        	{name:"Bicycle/Pedestrian Priority Roadway",color:"rgb(112,168,0)",icon:"road"},
+        	{name:"Paved Bike Shoulder",color:"rgb(255,170,0)",icon:"road"},
+        	{name:"Sign-Posted On-Road Bike Route",color:"rgb(255,255,0)",icon:"road"},
+        	{name:"Shared Use Path",color:"rgb(38,115,0)",icon:"leaf"},
+        	{name:"Hybrid",color:"rgb(255,167,127)",icon:"adjust"},
+        	{name:"To Be Determined",color:"rgb(223,115,255)",icon:"question-sign"}
+        ],mobile:true/*L.Browser.mobile*/};
+        var template = Mustache.compile("<div id='legendOutline' class='span3'><button type='button' id='legendButton' class='btn btn-info{{#mobile}} cwm-collapsed{{/mobile}}' data-target='#legendList' data-toggle='collapse'>{{^mobile}}Hide{{/mobile}}{{#mobile}}Show{{/mobile}} Legend</button><div id='legendList' class='collapse {{^mobile}}in{{/mobile}}'><ul class='icons'>{{#items}}<li><i class='icon-{{icon}} icon-2x' style='color:{{color}}'></i>{{name}}</li>{{/items}}</ul></div></div>");
+		$("#map").on("show",'#legendList',function(){$('#legendButton').html("Hide Legend").toggleClass("cwm-collapsed");$('.legend').toggleClass('leaflet-popup-content-wrapper')});
+		$("#map").on("hide",'#legendList',function(){$('#legendButton').html("Show Legend").toggleClass("cwm-collapsed");});
+		$("#map").on("hidden",'#legendList',function(){$('.legend').toggleClass('leaflet-popup-content-wrapper')});
+		container.innerHTML=template(data);
+        return container;
+    }
+});
+m.addControl(new Legend());
 	var mapmargin = parseInt($("#map").css("margin-top"), 10);
-	$('#map').css("height", ($(window).height() - mapmargin));
+
 	$(window).on("resize", function(){
-		$('#map').css("height", ($(window).height() - mapmargin));	
+	
 		if($(window).width()>=980){
 			$('#map').css("margin-top",40);
-		}else{
-			$('#map').css("margin-top",-20);
+				$('#map').css("height", ($(window).height() - mapmargin));	
+		}else if($(window).width()<334){
+		$('#map').css("margin-top",0);
+			$('#map').css("height", ($(window).height()-85));	
+	}else{
+				$('#map').css("margin-top",0);
+		$('#map').css("height", ($(window).height()-50));	
 		}
 	});
 	if($(window).width()>=980){
 		$('#map').css("margin-top",40);
+			$('#map').css("height", ($(window).height() - mapmargin));	
+	}else if($(window).width()<334){
+		$('#map').css("margin-top",0);
+			$('#map').css("height", ($(window).height()-85));	
 	}else{
-		$('#map').css("margin-top",-20);
+		$('#map').css("margin-top",0);
+			$('#map').css("height", ($(window).height()-50));	
 	}
 });
